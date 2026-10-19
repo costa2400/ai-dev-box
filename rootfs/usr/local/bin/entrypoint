@@ -1,0 +1,25 @@
+#!/bin/bash
+set -e
+
+# tools & dotfiles
+[ -e /root/.seeded ] || { echo "First boot: setting up /root..."; cp -a /opt/seed/. /root/; }
+chmod 700 /root
+mkdir -p -m 700 /root/.ssh/host
+touch /root/.ssh/authorized_keys && chmod 600 /root/.ssh/authorized_keys
+
+# persistent host key
+[ -f /root/.ssh/host/ed25519 ] || ssh-keygen -q -t ed25519 -N '' -f /root/.ssh/host/ed25519
+
+case "$SSH_PUBKEY" in
+  ssh-*|ecdsa-*|sk-*) grep -qxF "$SSH_PUBKEY" /root/.ssh/authorized_keys || echo "$SSH_PUBKEY" >> /root/.ssh/authorized_keys ;;
+  *) echo "SSH_PUBKEY not set or invalid; only existing keys in /root/.ssh/authorized_keys will work." ;;
+esac
+
+# env
+(umask 077; export -p | grep -vE '^declare -x (HOME|PWD|OLDPWD|SHLVL|TERM)=' > /run/devbox.env)
+
+caddy run --config /etc/caddy/Caddyfile --adapter caddyfile &
+[ -z "$CF_TUNNEL_TOKEN" ] || cloudflared tunnel --no-autoupdate run --token "$CF_TUNNEL_TOKEN" &
+
+mkdir -p /run/sshd
+exec /usr/sbin/sshd -D -e

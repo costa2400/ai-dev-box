@@ -1,0 +1,6 @@
+:80 {
+	reverse_proxy localhost:{$APP_PORT:3000}
+	handle_errors {
+		respond "Nothing is running on port {$APP_PORT:3000}." 502
+	}
+}

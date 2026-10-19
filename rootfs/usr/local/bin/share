@@ -1,0 +1,6 @@
+#!/bin/sh
+# share [port] - cloudflare tunnel
+port=${1:-3000}
+echo "Sharing localhost:$port (Ctrl+C to stop)..."
+cloudflared tunnel --no-autoupdate --url "http://localhost:$port" 2>&1 \
+  | grep --line-buffered -oE 'https://[a-z0-9-]+\.trycloudflare\.com|ERR .*'
