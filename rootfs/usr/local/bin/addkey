@@ -1,0 +1,14 @@
+#!/bin/sh
+# addkey <public key | github username> - allow an SSH key to log in
+case "$1" in
+  "") echo "Usage: addkey ssh-ed25519 AAAA...   or   addkey <github-username>"; exit 1 ;;
+  ssh-*|ecdsa-*|sk-*) keys="$*" ;;
+  *) keys=$(curl -fsSL --max-time 10 "https://github.com/$1.keys") && [ -n "$keys" ] \
+       || { echo "No public keys found for GitHub user '$1'."; exit 1; } ;;
+esac
+mkdir -p -m 700 /root/.ssh && touch /root/.ssh/authorized_keys && chmod 600 /root/.ssh/authorized_keys
+echo "$keys" | while read -r k; do
+  grep -qxF "$k" /root/.ssh/authorized_keys || echo "$k" >> /root/.ssh/authorized_keys
+done
+echo "Key added. Connect with: ssh -p <port> root@<host>"
+echo "(<host> and <port> are the address forwarded to port 22 in your deployment's details.)"

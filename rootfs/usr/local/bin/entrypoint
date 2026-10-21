@@ -10,10 +10,9 @@ touch /root/.ssh/authorized_keys && chmod 600 /root/.ssh/authorized_keys
 # persistent host key
 [ -f /root/.ssh/host/ed25519 ] || ssh-keygen -q -t ed25519 -N '' -f /root/.ssh/host/ed25519
 
-case "$SSH_PUBKEY" in
-  ssh-*|ecdsa-*|sk-*) grep -qxF "$SSH_PUBKEY" /root/.ssh/authorized_keys || echo "$SSH_PUBKEY" >> /root/.ssh/authorized_keys ;;
-  *) echo "SSH_PUBKEY not set or invalid; only existing keys in /root/.ssh/authorized_keys will work." ;;
-esac
+# optional: key from env
+case "$SSH_PUBKEY" in ssh-*|ecdsa-*|sk-*) addkey $SSH_PUBKEY >/dev/null ;; esac
+[ -s /root/.ssh/authorized_keys ] || echo "No SSH key yet. In Console, open the Shell tab and run: addkey <your public key or GitHub username>"
 
 # env
 (umask 077; export -p | grep -vE '^declare -x (HOME|PWD|OLDPWD|SHLVL|TERM)=' > /run/devbox.env)
