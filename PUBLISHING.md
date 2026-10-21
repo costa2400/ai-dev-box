@@ -2,17 +2,16 @@
 
 ## Image
 
-1. Replace `YOUR_GITHUB_USER` in `template/deploy.yaml` and `template/README.md`.
-2. Push this repo to GitHub as a public repo named `ai-dev-box`.
-3. Docker Hub: create an access token. In the GitHub repo settings, add variable `DOCKERHUB_USERNAME` and secret `DOCKERHUB_TOKEN`.
-4. `git tag v1.0.0 && git push --tags`. CI pushes `:1`, `:1.0.0` and `:latest` to GHCR and Docker Hub.
-5. On GitHub, open the package settings and set visibility to **public**. New GHCR packages start private and Akash can't pull them.
+1. Push this repo to GitHub as `costa2400/ai-dev-box` (public).
+2. Docker Hub: create an access token. In the GitHub repo settings, add variable `DOCKERHUB_USERNAME` and secret `DOCKERHUB_TOKEN`.
+3. `git tag v1.1.0 && git push --tags`. CI pushes `:1`, `:1.1`, `:1.1.0` and `:latest` to GHCR and Docker Hub. The SDL uses `:1.1`.
+4. On GitHub, open the package settings and set visibility to **public**. New GHCR packages start private and Akash can't pull them.
 
 ## Test deploy
 
 Upload `template/deploy.yaml` in Console and check:
 
-- [ ] Generated key and Console's SSH command both work
+- [ ] `addkey` in the Shell tab works, with a pasted key and a GitHub username
 - [ ] `claude --dangerously-skip-permissions` starts
 - [ ] Codex can run shell commands
 - [ ] Port 3000 is served at the deployment URL

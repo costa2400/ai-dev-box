@@ -2,27 +2,46 @@
 
 > You will need an [Akash Console](https://console.akash.network) account with some credit.
 
-## 1. Deploy
+## 1. Get an SSH key
 
-Open the [template](https://console.akash.network/new-deployment?step=edit-deployment&templateId=akash-network-awesome-akash-ai-dev-box). Under **SSH key**, click **Generate**. You get `keypair.zip` with two files:
+Already have one? Check with `ls ~/.ssh/*.pub` and skip ahead.
 
-- `id_rsa` is your private key. It stays on your computer. Don't share it.
-- `id_rsa.pub` is your public key. Console puts it on the box so it knows it's you.
-
-Already use SSH keys? Paste the contents of `~/.ssh/id_ed25519.pub` instead and skip the zip.
-
-Click **Deploy** and accept a bid.
-
-## 2. Connect
-
-On macOS or Linux:
+Otherwise run this in Terminal (macOS, Linux) or PowerShell (Windows) and press Enter at each prompt:
 
 ```sh
-mkdir -p ~/akash-key && unzip -o ~/Downloads/keypair.zip -d ~/akash-key
-chmod 600 ~/akash-key/id_rsa
+ssh-keygen -t ed25519
 ```
 
-Then copy the SSH command from your deployment's details and run it. On Windows, unzip with Explorer and run the same `ssh` command in PowerShell.
+It creates two files in `~/.ssh`:
+
+- `id_ed25519` is your private key. It stays on your computer. Don't share it.
+- `id_ed25519.pub` is your public key. You give this to the box so it knows it's you.
+
+## 2. Deploy
+
+Open the [template](https://console.akash.network/new-deployment?step=edit-deployment&templateId=akash-network-awesome-akash-ai-dev-box), click **Deploy** and accept a bid. No edits needed.
+
+## 3. Add your key
+
+Copy your public key:
+
+```sh
+pbcopy < ~/.ssh/id_ed25519.pub                       # macOS
+Get-Content ~/.ssh/id_ed25519.pub | Set-Clipboard    # Windows
+cat ~/.ssh/id_ed25519.pub                            # Linux, then copy it
+```
+
+In your deployment, open the **Shell** tab, type `addkey `, paste, and press Enter.
+
+Your key is already on GitHub? `addkey your-github-username` does the same.
+
+## 4. Connect
+
+In your deployment's details, find the host and port forwarded to port 22. Then:
+
+```sh
+ssh -p <port> root@<host>
+```
 
 You land in tmux. Close the window whenever you like; reconnect and you're back where you left off.
 
@@ -33,12 +52,11 @@ Host devbox
   HostName <host>
   Port <port>
   User root
-  IdentityFile ~/akash-key/id_rsa
 ```
 
 The port changes if you redeploy, so update it then.
 
-## 3. Log in to your agents
+## 5. Log in to your agents
 
 ```sh
 claude                      # follow the link, paste the code back
@@ -49,7 +67,7 @@ gemini
 
 For GitHub, run `gh auth login`.
 
-## 4. Build something
+## 6. Build something
 
 ```sh
 git clone https://github.com/you/your-app && cd your-app
@@ -58,7 +76,7 @@ claude
 
 Disconnect any time. The agent keeps working.
 
-## 5. Put it online
+## 7. Put it online
 
 **Quick link:** `share 3000` prints a public HTTPS URL. It lasts until you press Ctrl+C.
 
